@@ -113,22 +113,24 @@ void Snake::step(Game &game) {
             this->body.length++;
         }
     }
-    if (game.snakes_.size() != 0) {
-        if (game.snakes_[0].food.position_x == this->body.head[X_COORDINATE] &&
-            game.snakes_[0].food.position_y == this->body.head[Y_COORDINATE]) {
-            game.snakes_[0].gen_new_food_position();
-            this->body.length++;
+    if (!game.snakes_.empty()) {
+        for (int s = 0; s < game.snakes_.size(); s++) {
+            if (game.snakes_[s].food.position_x == this->body.head[X_COORDINATE] &&
+                game.snakes_[s].food.position_y == this->body.head[Y_COORDINATE]) {
+                game.snakes_[s].gen_new_food_position();
+                this->body.length++;
+            }
         }
     }
 
     ///snake want to die
     if (!(body.positions[0][X_COORDINATE] == body.positions[1][X_COORDINATE] &&
           body.positions[0][Y_COORDINATE] == body.positions[1][Y_COORDINATE])) {
-        int length = game.snake_ptr_->body.length;
-        if (game.snake2_ptr_ != nullptr) {
-            if (game.snake_ptr_->body.length < game.snake2_ptr_->body.length) length = game.snake2_ptr_->body.length;
-        }
-        for (int i = 1; i < length; i++) {
+//        int length = game.snake_ptr_->body.length;
+//        if (game.snake2_ptr_ != nullptr) {
+//            if (game.snake_ptr_->body.length < game.snake2_ptr_->body.length) length = game.snake2_ptr_->body.length;
+//        }
+        for (int i = 1; i < game.snake_ptr_->body.length; i++) {
             if (game.snake_ptr_->body.positions[i][X_COORDINATE] == body.head[X_COORDINATE] &&
                 game.snake_ptr_->body.positions[i][Y_COORDINATE] == body.head[Y_COORDINATE]) {
 //                    initialize(); ///GAME OVER
@@ -138,15 +140,16 @@ void Snake::step(Game &game) {
                 game.snake_die = true;
 //                    game.GameOver();
             }
-            if (game.snake2_ptr_ != nullptr) {
+        }
+        if (game.snake2_ptr_ != nullptr) {
+            for (int i = 1; i < game.snake2_ptr_->body.length; i++) {
                 if (game.snake2_ptr_->body.positions[i][X_COORDINATE] == body.head[X_COORDINATE] &&
                     game.snake2_ptr_->body.positions[i][Y_COORDINATE] == body.head[Y_COORDINATE]) {
 //                        initialize(); ///GAME OVER
                     game.snake2_die = true;
 //                        game.GameOver();
-                }
-                if (game.snake_ptr_->body.head[X_COORDINATE] == game.snake2_ptr_->body.head[X_COORDINATE] &&
-                    game.snake_ptr_->body.head[Y_COORDINATE] == game.snake2_ptr_->body.head[Y_COORDINATE]) {
+                } else if (game.snake_ptr_->body.head[X_COORDINATE] == game.snake2_ptr_->body.head[X_COORDINATE] &&
+                           game.snake_ptr_->body.head[Y_COORDINATE] == game.snake2_ptr_->body.head[Y_COORDINATE]) {
                     if (game.snake_ptr_->body.length >= game.snake2_ptr_->body.length)
                         game.snake2_die = true;///GAME OVER
                     else game.snake_die = true;
@@ -154,33 +157,36 @@ void Snake::step(Game &game) {
 //                        game.GameOver();
                 }
             }
-            if (game.snakes_.size() != 0) {
-                if (game.snakes_[0].body.positions[i][X_COORDINATE] == body.head[X_COORDINATE] &&
-                    game.snakes_[0].body.positions[i][Y_COORDINATE] == body.head[Y_COORDINATE]) {
-//                        initialize(); ///GAME OVER
-                    game.crazy_snake_die = true;
-//                        game.GameOver();
-                }
-                if (game.snake_ptr_->body.head[X_COORDINATE] == game.snakes_[0].body.head[X_COORDINATE] &&
-                    game.snake_ptr_->body.head[Y_COORDINATE] == game.snakes_[0].body.head[Y_COORDINATE]) {
-                    if (game.snake_ptr_->body.length >= game.snakes_[0].body.length)
-                        game.crazy_snake_die = true;///GAME OVER
-                    else game.snake_die = true;
-//                    game.is_paused_ = true;
-//                        game.GameOver();
-                }
-                if (game.snake2_ptr_ != nullptr) {
-                    if (game.snake2_ptr_->body.head[X_COORDINATE] == game.snakes_[0].body.head[X_COORDINATE] &&
-                        game.snake2_ptr_->body.head[Y_COORDINATE] == game.snakes_[0].body.head[Y_COORDINATE]) {
-                        if (game.snake2_ptr_->body.length >= game.snakes_[0].body.length)
-                            game.crazy_snake_die = true;///GAME OVER
-                        else game.snake2_die = true;
-//                    game.is_paused_ = true;
-//                        game.GameOver();
+        }
+        if (game.snakes_.size() != 0) {
+            for (int s = 0; s < game.snakes_.size(); s++) {
+                std::vector<Snake>::iterator it = game.snakes_.begin();
+                std::advance(it, s);
+                for (int i = 1; i < game.snake2_ptr_->body.length; i++) {
+                    if (game.snakes_[s].body.positions[i][X_COORDINATE] == body.head[X_COORDINATE] &&
+                        game.snakes_[s].body.positions[i][Y_COORDINATE] == body.head[Y_COORDINATE]) {
+
+                        game.snakes_.erase(it);
+                    } else if (game.snake_ptr_->body.head[X_COORDINATE] == game.snakes_[s].body.head[X_COORDINATE] &&
+                               game.snake_ptr_->body.head[Y_COORDINATE] == game.snakes_[s].body.head[Y_COORDINATE]) {
+                        if (game.snake_ptr_->body.length >= game.snakes_[s].body.length)
+                            game.snakes_.erase(it);
+                        else game.snake_die = true;
+
+                    } else if (game.snake2_ptr_ != nullptr) {
+                        if (game.snake2_ptr_->body.head[X_COORDINATE] == game.snakes_[s].body.head[X_COORDINATE] &&
+                            game.snake2_ptr_->body.head[Y_COORDINATE] == game.snakes_[s].body.head[Y_COORDINATE]) {
+                            if (game.snake2_ptr_->body.length >= game.snakes_[s].body.length)
+                                game.snakes_.erase(it);
+
+                            else game.snake2_die = true;
+
+                        }
                     }
                 }
             }
         }
+
     }
 }
 
@@ -202,6 +208,16 @@ void Snake::redefine_direction(Direction direction) {
 //            body.previos_direction = body.current_direction;
         body.current_direction = Direction::DIRECTION_DOWN;
     }
+}
+
+void Snake::random_direction() {
+    int dir = rand() % 4;
+    Direction direction;
+    if (dir == 0) direction = Direction::DIRECTION_UP;
+    if (dir == 1) direction = Direction::DIRECTION_DOWN;
+    if (dir == 2) direction = Direction::DIRECTION_LEFT;
+    if (dir == 3) direction = Direction::DIRECTION_RIGHT;
+    this->redefine_direction(direction);
 }
 
 Snake::Food::Food(size_t x, size_t y) : position_x(x), position_y(y) {

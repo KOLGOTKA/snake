@@ -7,6 +7,8 @@
 #include <vector>
 #include <thread>
 #include <queue>
+#include <iterator>
+#include <list>
 
 class Snake;
 class Game {
@@ -37,9 +39,7 @@ private:
     bool is_paused_{};
     bool snake_die = false;
     bool snake2_die = false;
-    bool crazy_snake_die = false;
     std::vector<Snake> snakes_;
-
     int speed_;
     sf::Vector2<unsigned int> window_size_;
     sf::Vector2<unsigned int> tile_size_;

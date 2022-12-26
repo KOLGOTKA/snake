@@ -61,4 +61,6 @@ public:
     void step(Game &game);
 
     void redefine_direction(Direction direction);
+
+    void random_direction();
 };
